@@ -1,43 +1,56 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Realtime Demo – Mic Auto-Enable Embed</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <!-- Helpful on some embeds to allow autoplayed TTS, etc. -->
-  <meta http-equiv="Permissions-Policy"
-        content="autoplay=(self *), microphone=(self *), camera=(self *), clipboard-read=(self *), clipboard-write=(self *)">
-  <style>
-    html,body,iframe{height:100%;margin:0}
-    iframe{width:100%;border:0}
-  </style>
+<meta charset="UTF-8">
+<title>Enable Microphone</title>
+<style>
+  body {
+    background-color: #111;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+  }
+  button {
+    font-size: 2rem;
+    padding: 2rem 4rem;
+    background-color: #28a745;
+    border: none;
+    border-radius: 1rem;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  }
+  button:hover {
+    background-color: #218838;
+  }
+</style>
 </head>
 <body>
-  <iframe
-    id="realtime"
-    src="https://ai-realtime-demo.netlify.app/"
-    allow="microphone; camera; autoplay; clipboard-read; clipboard-write; fullscreen; geolocation; display-capture; web-share; midi; encrypted-media"
-    allowfullscreen
-    referrerpolicy="no-referrer-when-downgrade">
-  </iframe>
 
-  <script>
-    // Try to pre-authorize mic immediately (helps when the browser auto-grants).
-    // If the engine/browser still requires a gesture, this will be a no-op until the user clicks.
-    (async () => {
-      if (!navigator.mediaDevices?.getUserMedia) return;
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        // Close tracks—we only wanted to unlock permission for the iframe.
-        stream.getTracks().forEach(t => t.stop());
-        // Let the iframe know it can start without prompting.
-        const iframe = document.getElementById('realtime');
-        iframe?.contentWindow?.postMessage({ type: 'mic-ready' }, '*');
-      } catch(e) {
-        // Ignore; the iframe will handle prompting/fallback on its own.
-        console.warn('Mic pre-auth failed or was blocked:', e);
-      }
-    })();
-  </script>
+<button id="enableMic">🎙 Enable Microphone</button>
+
+<script>
+document.getElementById('enableMic').addEventListener('click', async () => {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    console.log('Microphone access granted.');
+    
+    // Example: connect to your Unreal Engine WebRTC or WebSocket logic
+    // window.myUnrealAudioStream = stream;
+    
+    document.getElementById('enableMic').textContent = "Microphone Enabled ✅";
+    document.getElementById('enableMic').disabled = true;
+    document.getElementById('enableMic').style.backgroundColor = "#555";
+  } catch (err) {
+    console.error('Microphone access denied:', err);
+    alert('Microphone access was denied.');
+  }
+});
+</script>
+
 </body>
 </html>
