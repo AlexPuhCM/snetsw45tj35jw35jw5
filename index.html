@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Realtime Demo – Mic Auto-Enable Embed</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- Helpful on some embeds to allow autoplayed TTS, etc. -->
+  <meta http-equiv="Permissions-Policy"
+        content="autoplay=(self *), microphone=(self *), camera=(self *), clipboard-read=(self *), clipboard-write=(self *)">
+  <style>
+    html,body,iframe{height:100%;margin:0}
+    iframe{width:100%;border:0}
+  </style>
+</head>
+<body>
+  <iframe
+    id="realtime"
+    src="https://ai-realtime-demo.netlify.app/"
+    allow="microphone; camera; autoplay; clipboard-read; clipboard-write; fullscreen; geolocation; display-capture; web-share; midi; encrypted-media"
+    allowfullscreen
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>
+
+  <script>
+    // Try to pre-authorize mic immediately (helps when the browser auto-grants).
+    // If the engine/browser still requires a gesture, this will be a no-op until the user clicks.
+    (async () => {
+      if (!navigator.mediaDevices?.getUserMedia) return;
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        // Close tracks—we only wanted to unlock permission for the iframe.
+        stream.getTracks().forEach(t => t.stop());
+        // Let the iframe know it can start without prompting.
+        const iframe = document.getElementById('realtime');
+        iframe?.contentWindow?.postMessage({ type: 'mic-ready' }, '*');
+      } catch(e) {
+        // Ignore; the iframe will handle prompting/fallback on its own.
+        console.warn('Mic pre-auth failed or was blocked:', e);
+      }
+    })();
+  </script>
+</body>
+</html>
