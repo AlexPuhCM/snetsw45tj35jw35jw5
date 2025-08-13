@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Enable Microphone</title>
+<title>VR Mic Enable + Avatar</title>
 <style>
   body {
     background-color: #111;
@@ -13,6 +13,7 @@
     height: 100vh;
     margin: 0;
     font-family: sans-serif;
+    flex-direction: column;
   }
   button {
     font-size: 2rem;
@@ -24,8 +25,17 @@
     color: white;
     box-shadow: 0 0 20px rgba(0,0,0,0.5);
   }
-  button:hover {
-    background-color: #218838;
+  #avatarContainer {
+    display: none;
+    margin-top: 2rem;
+    width: 90%;
+    height: 70%;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 1rem;
   }
 </style>
 </head>
@@ -33,18 +43,24 @@
 
 <button id="enableMic">🎙 Enable Microphone</button>
 
+<div id="avatarContainer">
+  <!-- Replace with your avatar page URL -->
+  <iframe src="YOUR_AVATAR_PAGE.html"></iframe>
+</div>
+
 <script>
-document.getElementById('enableMic').addEventListener('click', async () => {
+document.getElementById('enableMic').addEventListener('pointerdown', async () => {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    console.log('Microphone access granted.');
-    
-    // Example: connect to your Unreal Engine WebRTC or WebSocket logic
-    // window.myUnrealAudioStream = stream;
-    
-    document.getElementById('enableMic').textContent = "Microphone Enabled ✅";
-    document.getElementById('enableMic').disabled = true;
-    document.getElementById('enableMic').style.backgroundColor = "#555";
+    await navigator.mediaDevices.getUserMedia({ audio: true });
+
+    // Hide the button permanently
+    const btn = document.getElementById('enableMic');
+    btn.style.display = 'none';
+    btn.remove(); // completely removes from DOM
+
+    // Show avatar content
+    document.getElementById('avatarContainer').style.display = 'block';
+
   } catch (err) {
     console.error('Microphone access denied:', err);
     alert('Microphone access was denied.');
